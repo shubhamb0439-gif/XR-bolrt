@@ -147,6 +147,10 @@
     aiDiagnosisTimer: null,
     aiDiagnosisStartTime: null,
 
+    // Template selection requirement
+    templateSelected: false,
+    templateSelectionModal: null,
+
     // Summary cache invalidation on note edits
     noteTouchedAtByMrn: new Map(),
     lastNoteTouchedAt: 0,
@@ -257,6 +261,122 @@
   // =============================================================================
   //  STYLES
   // =============================================================================
+  function createTemplateSelectionModal() {
+    const modal = document.createElement('div');
+    modal.id = 'templateSelectionModal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+    `;
+
+    const content = document.createElement('div');
+    content.style.cssText = `
+      background: #1f2937;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    `;
+
+    const title = document.createElement('h2');
+    title.textContent = 'Select Note Template';
+    title.style.cssText = `
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #fff;
+    `;
+
+    const desc = document.createElement('p');
+    desc.textContent = 'Please select a template before starting transcription';
+    desc.style.cssText = `
+      font-size: 14px;
+      color: #9ca3af;
+      margin-bottom: 24px;
+    `;
+
+    const select = document.createElement('select');
+    select.id = 'modalTemplateSelect';
+    select.style.cssText = `
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 16px;
+      border: 2px solid #374151;
+      border-radius: 8px;
+      background: #111827;
+      color: #fff;
+      margin-bottom: 24px;
+      cursor: pointer;
+    `;
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = 'Confirm Selection';
+    confirmBtn.style.cssText = `
+      width: 100%;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    `;
+    confirmBtn.onmouseover = () => confirmBtn.style.background = '#4338ca';
+    confirmBtn.onmouseout = () => confirmBtn.style.background = '#4f46e5';
+
+    confirmBtn.onclick = () => {
+      const selectedValue = select.value;
+      if (selectedValue) {
+        state.templateSelected = true;
+        if (dom.templateSelect) {
+          dom.templateSelect.value = selectedValue;
+        }
+        modal.remove();
+        state.templateSelectionModal = null;
+      }
+    };
+
+    content.appendChild(title);
+    content.appendChild(desc);
+    content.appendChild(select);
+    content.appendChild(confirmBtn);
+    modal.appendChild(content);
+
+    document.body.appendChild(modal);
+    state.templateSelectionModal = modal;
+
+    return { modal, select };
+  }
+
+  function showTemplateSelectionModal() {
+    if (state.templateSelectionModal) return;
+    if (state.templateSelected) return;
+
+    const { modal, select } = createTemplateSelectionModal();
+
+    if (dom.templateSelect) {
+      Array.from(dom.templateSelect.options).forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.textContent;
+        select.appendChild(option);
+      });
+      select.value = dom.templateSelect.value;
+    }
+  }
 
   function ensureUiStyles() {
     if (document.getElementById('scribe-ui-css')) return;
@@ -973,14 +1093,6 @@
       state.aiDiagnosisTimer = null;
     }
     state.aiDiagnosisStartTime = null;
-
-    if (dom.aiPane) {
-      const timerDisplay = dom.aiPane.querySelector('#aiDiagnosisTimer');
-      if (timerDisplay) {
-        timerDisplay.style.visibility = 'hidden';
-        timerDisplay.textContent = '';
-      }
-    }
   }
 
   function startAiDiagnosisTimer() {
@@ -994,12 +1106,11 @@
   }
 
   function updateAiDiagnosisTimerDisplay(elapsedSec) {
-    if (!dom.aiPane) return;
+    if (!dom.aiDiagnosisBody) return;
 
-    const timerDisplay = dom.aiPane.querySelector('#aiDiagnosisTimer');
+    const timerDisplay = dom.aiDiagnosisBody.querySelector('.scribe-ai-timer');
     if (timerDisplay) {
-      timerDisplay.style.visibility = 'visible';
-      timerDisplay.textContent = `Generating... ${elapsedSec}s`;
+      timerDisplay.textContent = `${elapsedSec}s`;
     }
   }
 
@@ -1661,7 +1772,7 @@
   //  AI DIAGNOSIS (UI + CACHE) — workflow preserved
   // =============================================================================
   function ensureAiDiagnosisPaneHeader() {
-    if (!dom.aiPane) return { head: null, btn: null, timer: null };
+    if (!dom.aiPane) return { head: null, btn: null };
 
     let head = dom.aiPane.querySelector('.scribe-ai-pane-head');
     if (!head) {
@@ -1669,19 +1780,8 @@
       head.className = 'scribe-ai-pane-head';
       head.style.padding = '12px 14px';
       head.style.display = 'flex';
-      head.style.justifyContent = 'space-between';
-      head.style.alignItems = 'center';
+      head.style.justifyContent = 'flex-end';
       dom.aiPane.insertBefore(head, dom.aiPane.firstChild);
-    }
-
-    let timer = dom.aiPane.querySelector('#aiDiagnosisTimer');
-    if (!timer) {
-      timer = document.createElement('span');
-      timer.id = 'aiDiagnosisTimer';
-      timer.style.cssText = 'color: #f59e0b; font-size: 14px; font-weight: 600; visibility: hidden;';
-      head.appendChild(timer);
-    } else if (timer.parentElement !== head) {
-      head.appendChild(timer);
     }
 
     let btn = dom.aiPane.querySelector('#aiDiagnosisGenerateBtn');
@@ -1701,7 +1801,7 @@
       if (existingBody) dom.aiDiagnosisBody = existingBody;
     }
 
-    return { head, btn, timer };
+    return { head, btn };
   }
 
   function setAiDiagnosisButtonVisual(btn, mode) {
@@ -1971,27 +2071,15 @@
           <div class="scribe-ai-loading">
             <div class="scribe-spinner"></div>
             <div style="margin-top: 12px;">AI is working in the background...</div>
+            <div class="scribe-ai-timer" style="margin-top: 8px; font-size: 18px; font-weight: bold; color: #f59e0b;">0s</div>
           </div>
         </div>
       `;
       return;
     }
 
-    if (state.aiDiagnosisLastError && !usable) {
-      dom.aiDiagnosisBody.innerHTML = `
-        <div class="scribe-ai-center">
-          <div class="scribe-ai-error">${escapeHtml(state.aiDiagnosisLastError)}</div>
-        </div>
-      `;
-      return;
-    }
-
     if (!usable) {
-      dom.aiDiagnosisBody.innerHTML = `
-        <div class="scribe-ai-center">
-          <div class="scribe-ai-empty">No data available</div>
-        </div>
-      `;
+      dom.aiDiagnosisBody.innerHTML = `<div class="scribe-empty"><div class="scribe-muted">AI diagnosis not available yet.</div></div>`;
       return;
     }
 
@@ -2402,6 +2490,7 @@
     syncDropdownToActiveTranscript();
 
     dom.templateSelect.onchange = () => {
+      state.templateSelected = true;
       applyTemplateToActiveTranscript(dom.templateSelect.value || CONFIG.SOAP_NOTE_TEMPLATE_ID);
     };
   }
@@ -2624,6 +2713,11 @@
     }
 
     if (packet.type === 'transcript_console') {
+      if (!state.templateSelected) {
+        showTemplateSelectionModal();
+        return;
+      }
+
       const p = packet.data || {};
       const { from, to, text = '', final = false, timestamp } = p;
 
@@ -3847,6 +3941,8 @@
 
       await initTemplateDropdown();
       setTemplateSelectValue(getActiveTemplateIdForItem(getActiveHistoryContext().item));
+
+      showTemplateSelectionModal();
 
       renderAiDiagnosisUi(null);
     } catch (e) {
