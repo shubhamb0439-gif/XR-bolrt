@@ -3294,6 +3294,7 @@
           currentNotes: state.currentNotes,
           activeNoteId: document.querySelector('.ehr-note-item.active')?.dataset?.noteId || CONFIG.SUMMARY_NOTE_ID,
           noteCache: [...state.noteCache.entries()],
+          summaryCache: [...state.summaryCacheByMrn.entries()],
           sidebarOpen: isSidebarOpen,
         })
       );
@@ -3510,6 +3511,12 @@
       return;
     }
 
+    const cached = state.summaryCacheByMrn.get(mrn);
+    if (cached && cached.text) {
+      renderSummaryDetail(cached.text, cached.template_title || 'Summary Note');
+      return;
+    }
+
     startSummaryTimer();
 
     try {
@@ -3523,6 +3530,13 @@
       if (!res.ok) throw new Error(data?.error || data?.message || `Failed (${res.status})`);
 
       stopSummaryTimer();
+
+      state.summaryCacheByMrn.set(mrn, {
+        text: data?.text,
+        template_title: data?.template_title || 'Summary Note',
+        fetchedAt: Date.now()
+      });
+
       renderSummaryDetail(data?.text, data?.template_title || 'Summary Note');
     } catch (e) {
       stopSummaryTimer();
@@ -3590,6 +3604,7 @@
       state.currentPatient = saved.currentPatient;
       state.currentNotes = saved.currentNotes || [];
       (saved.noteCache || []).forEach(([k, v]) => state.noteCache.set(k, v));
+      (saved.summaryCache || []).forEach(([k, v]) => state.summaryCacheByMrn.set(k, v));
 
       if (state.currentPatient?.mrn_no && state.currentPatient?.patient_id) {
         const m = String(state.currentPatient.mrn_no).trim();
