@@ -3280,6 +3280,13 @@
 
   function persistEHRState() {
     try {
+      const isSidebarOpen = dom.ehrSidebar?.classList.contains('active') || false;
+
+      if (!state.currentPatient || !isSidebarOpen) {
+        sessionStorage.removeItem(CONFIG.EHR_STORAGE_KEY);
+        return;
+      }
+
       sessionStorage.setItem(
         CONFIG.EHR_STORAGE_KEY,
         JSON.stringify({
@@ -3287,6 +3294,7 @@
           currentNotes: state.currentNotes,
           activeNoteId: document.querySelector('.ehr-note-item.active')?.dataset?.noteId || CONFIG.SUMMARY_NOTE_ID,
           noteCache: [...state.noteCache.entries()],
+          sidebarOpen: isSidebarOpen,
         })
       );
     } catch {
@@ -3588,6 +3596,11 @@
         state.patientCacheByMrn.set(m, { patientId: state.currentPatient.patient_id, patient: state.currentPatient });
       }
 
+      if (saved.sidebarOpen && dom.ehrSidebar && dom.ehrOverlay) {
+        dom.ehrSidebar.classList.add('active');
+        dom.ehrOverlay.classList.add('active');
+      }
+
       renderPatient(state.currentPatient);
       renderClinicalNotes(state.currentNotes);
 
@@ -3596,8 +3609,9 @@
 
       if (activeId === CONFIG.SUMMARY_NOTE_ID) loadSummary();
       else loadNote(activeId);
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn('[EHR] Failed to restore state:', err);
+      sessionStorage.removeItem(CONFIG.EHR_STORAGE_KEY);
     }
   }
 

@@ -1928,23 +1928,28 @@ async function generateSummaryForMrn(mrn) {
 
   // 5) Prompt: SINGLE paragraph, NO headings, NO labels like "HPI:", strict JSON only
   const prompt = `
-You are generating a clinical summary.
+You are generating a comprehensive clinical summary with 100% accuracy.
 
 Use ONLY the information provided in the visits below.
 The visits belong to the same patient.
 Each visit represents a different encounter.
 
-Accuracy rules:
-- Do NOT invent, guess, or assume anything.
-- Do NOT add clinical interpretation beyond what is explicitly written.
-- If information conflicts, prefer the most recent visit.
-- If key clinical details are not documented across all visits, state "not documented (N/A)" within the paragraph.
+CRITICAL ACCURACY RULES (100% compliance required):
+- ONLY use facts explicitly stated in the provided visits.
+- Do NOT infer, extrapolate, interpret, or make clinical assumptions.
+- Do NOT add any medical knowledge not present in the source data.
+- Do NOT fill in missing information with typical values or assumptions.
+- If data is missing or unclear, explicitly state "not documented" or "N/A".
+- If information conflicts between visits, use the most recent visit's data and note the discrepancy if clinically significant.
+- Preserve exact medical terminology, dosages, dates, and measurements from the source.
+- Include all documented clinical findings, diagnoses, medications, and plans.
 
 Formatting rules for the summary text:
 - Write EXACTLY ONE single paragraph (no line breaks).
 - Do NOT use headings, section titles, bullet points, or numbered lists.
 - Do NOT use labels like "Chief Complaint:", "HPI:", "ROS:", "Assessment:", "Plan:", "Medications:", "Follow Up:".
-- Use standard professional clinical narrative style.
+- Use standard professional clinical narrative style with smooth transitions.
+- Present information chronologically when relevant, with most recent information emphasized.
 
 Output MUST be valid JSON only (no markdown, no extra text).
 
