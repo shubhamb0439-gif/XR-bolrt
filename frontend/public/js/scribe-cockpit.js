@@ -2060,6 +2060,12 @@
     }
   }
 
+  function getCachedSummaryTextForMrn(mrn) {
+    if (!mrn) return '';
+    const cached = state.summaryCacheByMrn.get(String(mrn).trim());
+    return cached?.text || '';
+  }
+
   async function generateAiDiagnosisForActiveTranscript() {
     if (!state.SERVER_URL) return;
 

@@ -2025,7 +2025,7 @@ function noteSectionsToSoapText(noteSections) {
     .join('\n\n');
 }
 
-// ROUTE: receives note_sections + summary_text (per your requirement)
+// ROUTE: receives note_sections + summary_text (optional)
 app.post('/ehr/ai/diagnosis', async (req, res) => {
   try {
     const note_sections = req.body?.note_sections;
@@ -2034,9 +2034,6 @@ app.post('/ehr/ai/diagnosis', async (req, res) => {
     // Validate the exact fields you send from scribe cockpit
     if (!Array.isArray(note_sections)) {
       return res.status(400).json({ error: 'note_sections must be an array' });
-    }
-    if (!summary_text) {
-      return res.status(400).json({ error: 'summary_text is required' });
     }
 
     // Convert note_sections -> soapText
@@ -2047,7 +2044,7 @@ app.post('/ehr/ai/diagnosis', async (req, res) => {
 
     const out = await generateDiagnosisFromContext({
       soapText,
-      summaryText: summary_text
+      summaryText: summary_text || 'No patient summary available'
     });
 
     return res.json(out);
