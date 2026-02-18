@@ -1915,6 +1915,18 @@
       }
     }
 
+    if (inFlightForThis) {
+      dom.aiDiagnosisBody.innerHTML = `
+        <div class="scribe-ai-center">
+          <div class="scribe-ai-loading">
+            <div class="scribe-spinner"></div>
+            <div style="margin-top: 12px;">AI is working in the background...</div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
     if (!usable) {
       dom.aiDiagnosisBody.innerHTML = `<div class="scribe-empty"><div class="scribe-muted">AI diagnosis not available yet.</div></div>`;
       return;
