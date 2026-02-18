@@ -1624,24 +1624,14 @@
   function ensureAiDiagnosisPaneHeader() {
     if (!dom.aiPane) return { head: null, btn: null };
 
-    const heading = dom.aiPane.querySelector('h2, h3');
-    let head = null;
-
-    if (heading && heading.parentElement) {
-      head = heading.parentElement;
-      head.classList.add('scribe-ai-pane-head');
-      heading.classList.add('scribe-ai-pane-title');
-    } else {
-      head = dom.aiPane.querySelector('.scribe-ai-pane-head');
-      if (!head) {
-        head = document.createElement('div');
-        head.className = 'scribe-ai-pane-head';
-        const h = document.createElement('h2');
-        h.className = 'scribe-ai-pane-title';
-        h.textContent = 'AI Diagnosis';
-        head.appendChild(h);
-        dom.aiPane.insertBefore(head, dom.aiPane.firstChild);
-      }
+    let head = dom.aiPane.querySelector('.scribe-ai-pane-head');
+    if (!head) {
+      head = document.createElement('div');
+      head.className = 'scribe-ai-pane-head';
+      head.style.padding = '12px 14px';
+      head.style.display = 'flex';
+      head.style.justifyContent = 'flex-end';
+      dom.aiPane.insertBefore(head, dom.aiPane.firstChild);
     }
 
     let btn = dom.aiPane.querySelector('#aiDiagnosisGenerateBtn');
@@ -1850,7 +1840,7 @@
       <div class="scribe-ai-sections">
         ${list
         .map((sec) => {
-          const title = escapeHtml(sec?.title || sec?.name || 'Section');
+          const title = escapeHtml(sec?.component || sec?.title || sec?.name || 'Section');
           const raw = String(sec?.text || sec?.content || '').trim();
           const safe = escapeHtml(raw);
           const body = safe.replace(/\n/g, '<br/>');
@@ -1859,7 +1849,6 @@
               <div class="scribe-section scribe-ai-section">
                 <div class="scribe-section-head">
                   <h3>${title}</h3>
-                  <div class="scribe-section-meta">AI</div>
                 </div>
                 <div class="scribe-ai-comp-scroll">${body || '<span class="scribe-muted">No data</span>'}</div>
               </div>
@@ -1918,12 +1907,6 @@
         btn.disabled = true;
         btn.onclick = null;
         setAiDiagnosisButtonVisual(btn, 'busy');
-      } else if (usable) {
-        // Once generated, keep showing it even if template dropdown changes
-        btn.textContent = 'Generated';
-        btn.disabled = true;
-        btn.onclick = null;
-        setAiDiagnosisButtonVisual(btn, 'done');
       } else {
         btn.textContent = 'Generate';
         btn.disabled = false;
