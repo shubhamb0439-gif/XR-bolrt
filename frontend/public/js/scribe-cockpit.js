@@ -2076,14 +2076,10 @@
     // avoid parallel requests
     if (state.aiDiagnosisInFlight) return;
 
-    // if cached but unusable, remove it to avoid "Generated" stuck states
+    // Clear any existing diagnosis to allow regeneration
     const existing = getAiDiagnosisForItem(item, templateId);
-    if (existing && !isUsableDiagnosis(existing)) {
+    if (existing) {
       clearAiDiagnosisForHistoryItemTemplate(item.id, templateId);
-    }
-    if (existing && isUsableDiagnosis(existing)) {
-      renderAiDiagnosisUi(null);
-      return;
     }
 
     const note = getActiveNoteForItem(item) || {};
