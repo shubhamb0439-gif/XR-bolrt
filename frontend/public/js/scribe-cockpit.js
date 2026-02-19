@@ -320,10 +320,17 @@
       cursor: pointer;
     `;
 
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    `;
+
     const confirmBtn = document.createElement('button');
     confirmBtn.textContent = 'Confirm Selection';
     confirmBtn.style.cssText = `
-      width: 100%;
+      flex: 1;
       padding: 12px 24px;
       font-size: 16px;
       font-weight: 600;
@@ -349,10 +356,35 @@
       }
     };
 
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `
+      flex: 1;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background: #6b7280;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    `;
+    cancelBtn.onmouseover = () => cancelBtn.style.background = '#4b5563';
+    cancelBtn.onmouseout = () => cancelBtn.style.background = '#6b7280';
+
+    cancelBtn.onclick = () => {
+      modal.remove();
+      state.templateSelectionModal = null;
+    };
+
+    buttonContainer.appendChild(confirmBtn);
+    buttonContainer.appendChild(cancelBtn);
+
     content.appendChild(title);
     content.appendChild(desc);
     content.appendChild(select);
-    content.appendChild(confirmBtn);
+    content.appendChild(buttonContainer);
     modal.appendChild(content);
 
     document.body.appendChild(modal);
@@ -2089,7 +2121,11 @@
     }
 
     if (!usable) {
-      dom.aiDiagnosisBody.innerHTML = `<div class="scribe-ai-center"><div class="scribe-muted">AI diagnosis not available yet.</div></div>`;
+      if (state.aiDiagnosisLastError) {
+        dom.aiDiagnosisBody.innerHTML = `<div class="scribe-ai-center"><div class="scribe-ai-error" style="color: #f59e0b; font-weight: 500;">${escapeHtml(state.aiDiagnosisLastError)}</div></div>`;
+      } else {
+        dom.aiDiagnosisBody.innerHTML = `<div class="scribe-ai-center"><div class="scribe-muted">AI diagnosis not available yet.</div></div>`;
+      }
       return;
     }
 
