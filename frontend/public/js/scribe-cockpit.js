@@ -313,7 +313,7 @@
       padding: 12px 16px;
       font-size: 16px;
       border: 2px solid #374151;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #111827;
       color: #fff;
       margin-bottom: 24px;
@@ -333,16 +333,16 @@
       flex: 1;
       padding: 12px 24px;
       font-size: 16px;
-      font-weight: 600;
-      background: #4f46e5;
+      font-weight: 700;
+      background: #6366f1;
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       transition: background 0.2s;
     `;
-    confirmBtn.onmouseover = () => confirmBtn.style.background = '#4338ca';
-    confirmBtn.onmouseout = () => confirmBtn.style.background = '#4f46e5';
+    confirmBtn.onmouseover = () => confirmBtn.style.background = '#4f46e5';
+    confirmBtn.onmouseout = () => confirmBtn.style.background = '#6366f1';
 
     confirmBtn.onclick = () => {
       const selectedValue = select.value;
@@ -362,16 +362,16 @@
       flex: 1;
       padding: 12px 24px;
       font-size: 16px;
-      font-weight: 600;
-      background: #6b7280;
+      font-weight: 700;
+      background: #374151;
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       transition: background 0.2s;
     `;
     cancelBtn.onmouseover = () => cancelBtn.style.background = '#4b5563';
-    cancelBtn.onmouseout = () => cancelBtn.style.background = '#6b7280';
+    cancelBtn.onmouseout = () => cancelBtn.style.background = '#374151';
 
     cancelBtn.onclick = () => {
       modal.remove();
@@ -505,10 +505,10 @@
       /* AI Diagnosis button states */
       .scribe-ai-btn{
         border: 1px solid rgba(255,255,255,0.18);
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 6px 12px;
         font-size: 12px;
-        font-weight: 900;
+        font-weight: 700;
         cursor: pointer;
         color: #ffffff;
         transition: background .15s ease, border-color .15s ease, opacity .15s ease;
