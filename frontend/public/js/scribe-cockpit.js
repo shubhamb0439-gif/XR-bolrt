@@ -944,13 +944,16 @@
 
     removeTranscriptPlaceholder();
 
+    // Use the currently selected template ID from the dropdown
+    const selectedTemplateId = dom.templateSelect?.value || CONFIG.SOAP_NOTE_TEMPLATE_ID;
+
     const item = {
       id: uid(),
       from: from || 'Unknown',
       to: to || 'Unknown',
       text: String(text || '').trim(),
       timestamp: timestamp || Date.now(),
-      note: { templateId: CONFIG.SOAP_NOTE_TEMPLATE_ID, data: {} },
+      note: { templateId: selectedTemplateId, data: {} },
     };
 
     const hist = normalizeHistoryItems(loadHistory());
@@ -961,11 +964,10 @@
     trimTranscriptIfNeeded();
     dom.transcript.scrollTop = dom.transcript.scrollHeight;
 
-    state.pendingSoapItemQueue.push(item.id);
     setActiveTranscriptId(item.id);
 
-    // keep original behavior: show timer while waiting for soap_note_console
-    if (!state.soapGenerating) startSoapGenerationTimer();
+    // Automatically generate note using the selected template
+    requestNoteGenerationForActiveTranscript(selectedTemplateId);
   }
 
   // =============================================================================
@@ -2747,6 +2749,8 @@
     }
 
     if (packet.type === 'soap_note_console') {
+      // Legacy handler - SOAP notes are now generated from frontend using selected template
+      // This handler is kept for backward compatibility but should not be used in normal flow
       const soap = packet.data || {};
       initializeEditMetaForSoap(soap);
       syncTemplateRowsFromSections(soap);
@@ -2759,8 +2763,10 @@
 
       const idx = hist.findIndex((x) => x.id === targetId);
       if (idx !== -1) {
-        hist[idx].note = hist[idx].note || { templateId: CONFIG.SOAP_NOTE_TEMPLATE_ID, data: {} };
-        hist[idx].note.templateId = CONFIG.SOAP_NOTE_TEMPLATE_ID;
+        // Use the template ID from the note data or fall back to dropdown selection
+        const templateId = soap?._templateMeta?.id || dom.templateSelect?.value || CONFIG.SOAP_NOTE_TEMPLATE_ID;
+        hist[idx].note = hist[idx].note || { templateId: templateId, data: {} };
+        hist[idx].note.templateId = templateId;
         hist[idx].note.data = soap;
       }
       saveHistory(hist);
@@ -2775,7 +2781,9 @@
         // Mark note as touched so Summary regenerates for latest note
         markNoteTouchedForCurrentMrn();
         renderSoapNote(state.latestSoapNote);
-        setTemplateSelectValue(CONFIG.SOAP_NOTE_TEMPLATE_ID);
+        // Use the template ID from the note data
+        const templateId = soap?._templateMeta?.id || hist[idx]?.note?.templateId || CONFIG.SOAP_NOTE_TEMPLATE_ID;
+        setTemplateSelectValue(templateId);
       }
 
       renderAiDiagnosisUi(null);

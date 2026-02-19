@@ -5921,47 +5921,6 @@ io.on('connection', (socket) => {
         }
         io.to(pairRoomId).emit('signal', { type: 'transcript_console', from, data: out });
         dlog('[transcript] emitted signal "transcript_console" to pair room', pairRoomId);
-
-
-        // Generate SOAP note if this transcript is final
-        if (out.final && out.text) {
-          (async () => {
-            try {
-              const soapNote = await generateSoapNote(out.text);
-
-              const target = pairRoomId;
-
-              // Send SOAP note back to console UI
-              if (target) {
-                io.to(target).emit('signal', {
-                  type: 'soap_note_console',
-                  from,
-                  data: soapNote,
-                });
-              }
-              console.log('[SOAP_NOTE]', JSON.stringify(soapNote, null, 2));
-
-              // Check Medication against dbo.DrugMaster(drug) and log availability
-              const { results } = await checkSoapMedicationAvailability(soapNote, {
-                schema: 'dbo',
-                table: 'DrugMaster',
-                nameCol: 'drug',
-              });
-
-              // Emit availability to both Dock (target) and Scribe Cockpit
-              if (target) {
-                io.to(target).emit('signal', {
-                  type: 'drug_availability_console',
-                  from,
-                  data: results,
-                });
-              }
-
-            } catch (e) {
-              console.error('[SOAP/DRUG] failed:', e?.message || e);
-            }
-          })();
-        }
       } catch (e) {
         dwarn('[transcript] emit failed:', e.message);
       }
