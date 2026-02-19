@@ -2468,6 +2468,12 @@
   async function applyTemplateToActiveTranscript(newTemplateId) {
     const templateId = normalizeTemplateId(newTemplateId);
     setTemplateSelectValue(templateId);
+
+    // Clear old note data immediately to prevent showing wrong template sections
+    state.latestSoapNote = {};
+    renderSoapBlank();
+    clearAiDiagnosisPaneUi();
+
     await requestNoteGenerationForActiveTranscript(templateId);
   }
 
