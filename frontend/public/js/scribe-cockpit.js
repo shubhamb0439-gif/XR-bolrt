@@ -550,13 +550,14 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 14px;
+        padding: 10px 12px;
         gap: 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
       }
       .scribe-ai-pane-title {
         margin: 0;
         font-size: 16px;
-        font-weight: 900;
+        font-weight: 700;
         color: #ffffff;
         flex: 0 0 auto;
       }
@@ -568,6 +569,8 @@
         font-size: 14px;
         line-height: 1.8;
         word-break: break-word;
+        text-align: justify;
+        text-justify: inter-word;
       }
 
       .scribe-ai-center {
@@ -603,9 +606,15 @@
   color: rgba(255,255,255,0.92);
   line-height: 1.7;
   word-break: break-word;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
       .scribe-ai-comp-title { font-weight: 900; color: #ffffff; margin: 0 0 8px 0; }
+      .scribe-ai-comp-text {
+        text-align: justify;
+        text-justify: inter-word;
+      }
       .scribe-ai-comp-text p {
         margin: 0 0 12px 0;
         color: rgba(255,255,255,0.92);

@@ -204,12 +204,12 @@ button { transition: background-color 0.3s; font-weight: 500; }
    Add To EHR button states
    ========================= */
 
-/* Enabled state - Bright Red */
+/* Enabled state - Jet Red */
 #_scribe_add_ehr{
-  background: #dc2626;
+  background: #ff0000;
 }
 #_scribe_add_ehr:hover{
-  background: #b91c1c;
+  background: #cc0000;
 }
 
 /* Disabled state - Dim Red */
@@ -529,7 +529,7 @@ body.is-resizing .ehr-resize-handle::after{
   right: calc(-1 * var(--ehr-sidebar-w));
   width: var(--ehr-sidebar-w);
   height: 100vh;
-  background: #23272f;
+  background: #030710;
   z-index: 999;
   box-shadow: -8px 0 26px rgba(0, 0, 0, 0.55);
   transition: right 0.35s ease;
@@ -542,7 +542,7 @@ body.is-resizing .ehr-resize-handle::after{
 /* ... keep the rest of your EHR styles unchanged ... */
 /* Header */
 .ehr-sidebar-header {
-  background: #23272f;
+  background: #030710;
   padding: 12px 14px;
   border-bottom: 1px solid rgba(255,255,255,0.10);
 }
@@ -581,7 +581,7 @@ body.is-resizing .ehr-resize-handle::after{
   flex: 1;
   overflow: hidden;
   padding: 12px;
-  background: #23272f;
+  background: #030710;
 }
 
 /* Initial State */
@@ -640,7 +640,7 @@ body.is-resizing .ehr-resize-handle::after{
 
 /* Card */
 .ehr-card {
-  background: #2d3139;
+  background: #0f1419;
   border-radius: 10px;
   padding: 12px;
   border: 1px solid rgba(255,255,255,0.06);
