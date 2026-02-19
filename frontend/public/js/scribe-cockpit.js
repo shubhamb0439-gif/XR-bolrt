@@ -1108,9 +1108,17 @@
   }
 
   function updateAiDiagnosisTimerDisplay(elapsedSec) {
-    if (!dom.aiDiagnosisBody) return;
+    let timerDisplay = null;
 
-    const timerDisplay = dom.aiDiagnosisBody.querySelector('.scribe-ai-timer');
+    if (dom.aiDiagnosisBody) {
+      timerDisplay = dom.aiDiagnosisBody.querySelector('.scribe-ai-timer');
+    }
+
+    if (!timerDisplay) {
+      const fallbackBox = document.querySelector('[data-section="__ai_diagnosis__"] .scribe-ai-timer');
+      if (fallbackBox) timerDisplay = fallbackBox;
+    }
+
     if (timerDisplay) {
       timerDisplay.textContent = `${elapsedSec}s`;
     }
@@ -2081,7 +2089,7 @@
     }
 
     if (!usable) {
-      dom.aiDiagnosisBody.innerHTML = `<div class="scribe-empty"><div class="scribe-muted">AI diagnosis not available yet.</div></div>`;
+      dom.aiDiagnosisBody.innerHTML = `<div class="scribe-ai-center"><div class="scribe-muted">AI diagnosis not available yet.</div></div>`;
       return;
     }
 
@@ -2146,7 +2154,15 @@
     inner.className = 'scribe-ai-body-inner';
 
     if (inFlightForThis) {
-      inner.innerHTML = `<div class="scribe-ai-center"><div class="scribe-ai-loading">Please, AI is gathering the details…</div></div>`;
+      inner.innerHTML = `
+        <div class="scribe-ai-center">
+          <div class="scribe-ai-loading">
+            <div class="scribe-spinner"></div>
+            <div style="margin-top: 12px;">AI is working in the background...</div>
+            <div class="scribe-ai-timer" style="margin-top: 8px; font-size: 18px; font-weight: bold; color: #f59e0b;">0s</div>
+          </div>
+        </div>
+      `;
     } else if (state.aiDiagnosisLastError && !usable) {
       inner.innerHTML = `<div class="scribe-ai-center"><div class="scribe-ai-error">${escapeHtml(state.aiDiagnosisLastError)}</div></div>`;
     } else if (!usable) {
@@ -2238,8 +2254,11 @@
     const note = getActiveNoteForItem(item) || {};
     const noteSections = buildNoteSectionsPayload(note);
 
-    if (!noteSections.length) {
-      state.aiDiagnosisLastError = 'Please generate the note first (note sections are missing).';
+    const mrn = String(state.currentPatient?.mrn_no || '').trim() || null;
+    const summaryText = mrn ? getCachedSummaryTextForMrn(mrn) : '';
+
+    if (!noteSections.length || !summaryText) {
+      state.aiDiagnosisLastError = 'AI does not have enough data to provide diagnosis.';
       renderAiDiagnosisUi(null);
       return;
     }
@@ -2251,10 +2270,6 @@
     renderAiDiagnosisUi(null);
 
     try {
-      const mrn = String(state.currentPatient?.mrn_no || '').trim() || null;
-
-      // IMPORTANT: no /ehr/ai/summary call here
-      const summaryText = mrn ? getCachedSummaryTextForMrn(mrn) : '';
 
       const res = await fetch(`${state.SERVER_URL}${CONFIG.AI_DIAGNOSIS_ENDPOINT}`, {
         method: 'POST',
