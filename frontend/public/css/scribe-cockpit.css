@@ -529,7 +529,7 @@ body.is-resizing .ehr-resize-handle::after{
   right: calc(-1 * var(--ehr-sidebar-w));
   width: var(--ehr-sidebar-w);
   height: 100vh;
-  background: #1a202c;
+  background: #23272f;
   z-index: 999;
   box-shadow: -8px 0 26px rgba(0, 0, 0, 0.55);
   transition: right 0.35s ease;
@@ -542,7 +542,7 @@ body.is-resizing .ehr-resize-handle::after{
 /* ... keep the rest of your EHR styles unchanged ... */
 /* Header */
 .ehr-sidebar-header {
-  background: #0f172a;
+  background: #23272f;
   padding: 12px 14px;
   border-bottom: 1px solid rgba(255,255,255,0.10);
 }
@@ -581,7 +581,7 @@ body.is-resizing .ehr-resize-handle::after{
   flex: 1;
   overflow: hidden;
   padding: 12px;
-  background: #1a202c;
+  background: #23272f;
 }
 
 /* Initial State */
@@ -609,11 +609,16 @@ body.is-resizing .ehr-resize-handle::after{
   color: #fff;
   border: none;
   border-radius: 10px;
-  padding: 10px;
+  padding: 0 16px;
+  height: 36px;
+  min-width: 132px;
   font-weight: 700;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   transition: background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .ehr-search-button:hover { background: #4f46e5; }
 
@@ -635,7 +640,7 @@ body.is-resizing .ehr-resize-handle::after{
 
 /* Card */
 .ehr-card {
-  background: #1f2937;
+  background: #2d3139;
   border-radius: 10px;
   padding: 12px;
   border: 1px solid rgba(255,255,255,0.06);

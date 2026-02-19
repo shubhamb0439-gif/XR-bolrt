@@ -504,56 +504,61 @@
 
       /* AI Diagnosis button states */
       .scribe-ai-btn{
-        border: 1px solid rgba(255,255,255,0.18);
+        border: 0;
         border-radius: 10px;
-        padding: 6px 12px;
-        font-size: 12px;
+        padding: 0 16px;
+        height: 36px;
+        min-width: 132px;
+        font-size: 13px;
         font-weight: 700;
         cursor: pointer;
         color: #ffffff;
         transition: background .15s ease, border-color .15s ease, opacity .15s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
       .scribe-ai-btn.scribe-ai-btn--generate{
         background: rgba(34,197,94,0.18);
-        border-color: rgba(34,197,94,0.55);
+        border: 1px solid rgba(34,197,94,0.55);
       }
       .scribe-ai-btn.scribe-ai-btn--generate:hover{
         background: rgba(34,197,94,0.26);
-        border-color: rgba(34,197,94,0.75);
+        border: 1px solid rgba(34,197,94,0.75);
       }
       .scribe-ai-btn.scribe-ai-btn--generating{
         background: rgba(245,158,11,0.18);
-        border-color: rgba(245,158,11,0.55);
+        border: 1px solid rgba(245,158,11,0.55);
         cursor: not-allowed;
       }
       .scribe-ai-btn.scribe-ai-btn--generated{
         background: rgba(148,163,184,0.12);
-        border-color: rgba(148,163,184,0.35);
+        border: 1px solid rgba(148,163,184,0.35);
         color: rgba(255,255,255,0.75);
         cursor: not-allowed;
       }
       .scribe-ai-btn:disabled{ opacity: 1; }
 
-      /* AI Diagnosis header: centered title, right button */
+      /* AI Diagnosis button in section head: ensure it stays on same line */
+      .scribe-section-head .scribe-ai-btn {
+        flex-shrink: 0;
+        margin-left: auto;
+      }
+
+      /* AI Diagnosis header: title left, button right aligned on same line */
       .scribe-ai-pane-head {
-        position: relative;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         padding: 12px 14px;
+        gap: 12px;
       }
       .scribe-ai-pane-title {
         margin: 0;
         font-size: 16px;
         font-weight: 900;
         color: #ffffff;
-        text-align: center;
-      }
-      .scribe-ai-pane-head .scribe-ai-btn {
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
+        flex: 0 0 auto;
       }
 
       .scribe-ai-body { padding: 12px 14px; color: #ffffff; height: 100%; box-sizing: border-box; }
