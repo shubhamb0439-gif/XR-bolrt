@@ -3402,6 +3402,11 @@
 
           await swalSuccessSaved(saveSnapshot?.noteId);
 
+          // Invalidate summary cache immediately after successful save
+          if (saveSnapshot?.mrn && state.summaryCacheByMrn.has(saveSnapshot.mrn)) {
+            state.summaryCacheByMrn.delete(saveSnapshot.mrn);
+          }
+
           clearActiveTranscriptCompletelyAfterEhrSave();
           notifyEhrSidebarAfterSave(saveSnapshot);
         } catch (e) {
@@ -3789,6 +3794,12 @@
 
   async function refreshPatientAndNotes(mrn) {
     state.noteCache.clear();
+
+    // Invalidate summary cache for this MRN since new notes have been added
+    const mrnKey = String(mrn).trim();
+    if (mrnKey && state.summaryCacheByMrn.has(mrnKey)) {
+      state.summaryCacheByMrn.delete(mrnKey);
+    }
 
     const data = await apiGetJson(`${state.SERVER_URL}/ehr/patient/${encodeURIComponent(mrn)}`);
     state.currentPatient = data.patient || {};
